@@ -1,0 +1,141 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1664826452707776731
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8296199865286006044}
+  - component: {fileID: 5073937598194414474}
+  - component: {fileID: 4291914850386820937}
+  - component: {fileID: 612756981151153539}
+  m_Layer: 0
+  m_Name: Tiff_Renderer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8296199865286006044
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1664826452707776731}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 659.4906, y: 835.3996, z: 361.099}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5073937598194414474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1664826452707776731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a174de901156944c9489d4eebb7ab86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  geoMetadata:
+    coordinateSystem: 
+    projection: 
+    geoTransform:
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    bounds:
+      minLongitude: 0
+      maxLongitude: 0
+      minLatitude: 0
+      maxLatitude: 0
+    elevation:
+      minElevation: 0
+      maxElevation: 0
+      hasElevationData: 0
+      isSingleBandDEM: 0
+      noDataValue: 0
+      hasNoDataValue: 0
+      elevationUnit: meters
+    width: 0
+    height: 0
+    bandCount: 0
+    dataType: 
+    hasValidGeoreference: 0
+  enableCoordinateDisplay: 1
+  militaryGridSystem: {fileID: 0}
+  tiffFileName: Navyug-10km_1_optimized.tif
+  fluidCameraController: {fileID: 0}
+  maxTotalTiles: 10000
+  maxTilesPerFrame: 50
+  maxQueueSize: 250
+  crossFadeShader: {fileID: 4800000, guid: c77bd696490c98e42b5bba0d6c29dd8b, type: 3}
+  enableCrossFadeTransitions: 1
+  crossFadeDuration: 0.25
+  enableDiskCache: 1
+  maxCacheFilesSize: 2000
+  clearCacheOnStart: 1
+  targetCamera: {fileID: 0}
+  tileMaterial: {fileID: 0}
+  showDebugInfo: 0
+  emergencyStopKey: 32
+  maxLoadingTime: 300
+  enableElevationDisplay: 1
+  enableMeasurementTools: 0
+--- !u!114 &4291914850386820937
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1664826452707776731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd83889194d5db94ab6539bf95409ed4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableAggressiveOptimization: 1
+  forceGarbageCollection: 1
+  optimizeRenderingSettings: 1
+  showPerformanceStats: 1
+--- !u!114 &612756981151153539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1664826452707776731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ed9102cf5a2e5e4dad8822b18696ff1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  safeTiffRenderer: {fileID: 5073937598194414474}
+  mapProfiles: []
+  currentProfile:
+    categoryName: 
+    minTiles: 0
+    maxTiles: 0
+    maxTotalTiles: 0
+    maxTilesPerFrame: 0
+    maxQueueSize: 0
+    maxLoadingTime: 0
+    maxAllowedLOD: 0
+    lodStabilityFactor: 0
+    forceStableRendering: 0
+    memoryPressureThreshold: 0
+    enableAggressiveCleanup: 0
+  currentTileCount: 0
+  currentMapCategory: 

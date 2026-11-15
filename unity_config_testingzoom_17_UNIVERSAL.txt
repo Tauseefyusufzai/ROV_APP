@@ -1,0 +1,30 @@
+ 
+// UNIVERSAL AUTO-GENERATED Configuration for testingzoom_17 
+// Map Category: LARGE MAP (2376 tiles) 
+// Auto-optimized settings for perfect rendering 
+ 
+tiffFileName = "testingzoom_17_optimized.tif"; 
+ 
+// UNIVERSAL AUTO-OPTIMIZATION (No manual tuning needed): 
+maxTotalTiles = 3000;   // Auto-calculated for 2376 tiles 
+maxTilesPerFrame = 50;  // LARGE MAP optimized loading speed 
+maxQueueSize = 300;     // LARGE MAP optimized queue size 
+maxLoadingTime = 300;   // LARGE MAP optimized timeout 
+showDebugInfo = true;   // Monitor the universal system 
+ 
+// ENHANCED FEATURES (Always enabled): 
+enableCoordinateDisplay = true;    // Multi-format coordinates 
+enableElevationDisplay = false;    // Set to true for DEM files 
+enableMeasurementTools = true;     // Professional measurement tools 
+ 
+// UNIVERSAL SYSTEM STATUS: 
+// ✓ Map automatically categorized as: LARGE MAP 
+// ✓ LOD range: 0-4 (automatically enforced) 
+// ✓ Stability optimized for map size 
+// ✓ Memory management configured 
+// ✓ Performance settings optimized 
+ 
+// SETUP INSTRUCTIONS: 
+// 1. Copy above settings to your SafeTiffRenderer component 
+// 2. Add UniversalMapHandler component (if not already added) 
+// 3. Press Play - the system will auto-optimize everything else 

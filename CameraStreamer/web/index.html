@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROV Navyug - Live Camera Streamer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- HLS.js Client -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(22, 28, 45, 0.45);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary: #00f2fe;
+            --primary-glow: rgba(0, 242, 254, 0.4);
+            --secondary: #4facfe;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(79, 172, 254, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 242, 254, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Ambient glowing shapes in background */
+        .glowing-orb {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .orb-left { top: 20%; left: -100px; }
+        .orb-right { bottom: 10%; right: -100px; }
+
+        header {
+            padding: 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--card-border);
+            backdrop-filter: blur(12px);
+            background: rgba(11, 15, 25, 0.5);
+            z-index: 10;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px var(--primary-glow));
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success);
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse 1.5s infinite;
+        }
+
+        .offline-badge {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        .offline-dot {
+            background-color: var(--danger);
+            box-shadow: 0 0 10px var(--danger);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 14px var(--success); }
+            100% { transform: scale(0.9); opacity: 0.6; }
+        }
+
+        main {
+            flex: 1;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 32px 24px;
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 1024px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 242, 254, 0.15);
+            box-shadow: 0 8px 36px 0 rgba(0, 242, 254, 0.05);
+        }
+
+        .player-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            background: #06080e;
+            color: var(--text-muted);
+            z-index: 2;
+        }
+
+        .video-placeholder i {
+            font-size: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid var(--primary);
+            padding-left: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* Checkbox toggle design */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #fff;
+            top: 3px;
+            left: 3px;
+            transition: var(--transition);
+        }
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        input[type="checkbox"]:checked + .toggle-switch {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        input[type="checkbox"]:checked + .toggle-switch::after {
+            left: 23px;
+        }
+
+        /* Copyable Link Box */
+        .url-box {
+            display: flex;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 14px;
+            transition: var(--transition);
+        }
+
+        .url-box:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .url-label {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 12px;
+            padding: 12px 14px;
+            border-right: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+            text-transform: uppercase;
+        }
+
+        .url-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            padding: 12px 16px;
+            font-family: monospace;
+            font-size: 13px;
+            outline: none;
+            width: 100%;
+        }
+
+        .btn-copy {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-left: 1px solid var(--card-border);
+        }
+
+        .btn-copy:hover {
+            color: var(--primary);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: #000;
+            font-weight: 600;
+            font-size: 15px;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--primary-glow);
+            opacity: 0.95;
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Log console */
+        .console-box {
+            background: #040711;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 16px;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            color: #38bdf8;
+            height: 150px;
+            overflow-y: auto;
+            margin-top: 10px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .console-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-muted);
+            font-size: 13px;
+            border-top: 1px solid var(--card-border);
+            margin-top: auto;
+        }
+
+        /* Copy alert toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(16, 185, 129, 0.95);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            z-index: 100;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="glowing-orb orb-left"></div>
+    <div class="glowing-orb orb-right"></div>
+
+    <header>
+        <div class="logo-area">
+            <i class="fa-solid fa-ship logo-icon"></i>
+            <div>
+                <h1>ROV Navyug</h1>
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: 500;">Camera Stream Broadcaster</div>
+            </div>
+        </div>
+        <div id="statusBadge" class="live-badge offline-badge">
+            <div id="statusDot" class="live-dot offline-dot"></div>
+            <span id="statusText">Offline</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- LEFT COLUMN: Live Player -->
+        <div class="glass-card player-container">
+            <h2 class="section-title"><i class="fa-solid fa-play"></i> Real-Time Feed Monitor</h2>
+            <div class="video-wrapper">
+                <div id="videoPlaceholder" class="video-placeholder">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    <span>Connecting to stream backend...</span>
+                </div>
+                <video id="videoPlayer" controls autoplay muted playsinline></video>
+            </div>
+
+            <div style="margin-top: 10px;">
+                <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-muted);">
+                    <i class="fa-solid fa-circle-info"></i> Streaming URL Feeds
+                </h3>
+                <div class="url-box">
+                    <div class="url-label">HLS</div>
+                    <input type="text" class="url-input" id="hlsUrl" readonly value="">
+                    <button class="btn-copy" onclick="copyUrl('hlsUrl')" title="Copy URL"><i class="fa-regular fa-copy"></i></button>
+                </div>
+                <div class="url-box">
+                    <div class="url-label">MP4</div>
+                    <input type="text" class="url-input" id="mp4Url" readonly value="">
+                    <button class="btn-copy" onclick="copyUrl('mp4Url')" title="Copy URL"><i class="fa-regular fa-copy"></i></button>
+                </div>
+                <div class="url-box">
+                    <div class="url-label">TS</div>
+                    <input type="text" class="url-input" id="tsUrl" readonly value="">
+                    <button class="btn-copy" onclick="copyUrl('tsUrl')" title="Copy URL"><i class="fa-regular fa-copy"></i></button>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+                    <i class="fa-solid fa-lightbulb" style="color: var(--primary);"></i> 
+                    <strong>Tip:</strong> You can open the <strong>TS</strong> or <strong>MP4</strong> links directly in VLC Media Player (<em>Media &gt; Open Network Stream</em>) or stream them into custom video players.
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Settings and Logs -->
+        <div style="display: flex; flex-direction: column; gap: 32px;">
+            <!-- Settings Card -->
+            <div class="glass-card">
+                <h2 class="section-title"><i class="fa-solid fa-sliders"></i> Stream Configuration</h2>
+                <div class="control-group">
+                    <div class="input-group">
+                        <label for="cameraSelect">Active Camera</label>
+                        <select id="cameraSelect" onchange="applySettings()"></select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="audioSelect">Audio Input Source</label>
+                        <select id="audioSelect" onchange="applySettings()"></select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="resolutionSelect">Resolution Size</label>
+                            <select id="resolutionSelect" onchange="applySettings()">
+                                <option value="default">Camera Default</option>
+                                <option value="1920x1080">1920 x 1080 (1080p)</option>
+                                <option value="1280x720">1280 x 720 (720p)</option>
+                                <option value="854x480">854 x 480 (480p)</option>
+                                <option value="640x480">640 x 480 (VGA)</option>
+                                <option value="320x240">320 x 240 (QVGA)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="fpsSelect">Frames Per Second (FPS)</label>
+                            <select id="fpsSelect" onchange="applySettings()">
+                                <option value="30">30 FPS</option>
+                                <option value="25">25 FPS</option>
+                                <option value="15">15 FPS</option>
+                                <option value="10">10 FPS</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--card-border); padding-top: 16px;">
+                        <label class="toggle-container" for="audioEnabled">
+                            <input type="checkbox" id="audioEnabled" checked onchange="applySettings()">
+                            <div class="toggle-switch"></div>
+                            <span>Enable Audio Encoder</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Encoder logs -->
+            <div class="glass-card" style="flex: 1;">
+                <div class="console-header">
+                    <span><i class="fa-solid fa-terminal"></i> FFmpeg Encoder Logs</span>
+                    <span id="logTimer" style="color: var(--text-muted);">Refreshing</span>
+                </div>
+                <div class="console-box" id="logsConsole">Starting log capture...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        ROV Navyug Project &copy; 2026. Custom Broadcast Server.
+    </footer>
+
+    <!-- Toast message -->
+    <div id="toast" class="toast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>Link copied to clipboard!</span>
+    </div>
+
+    <script>
+        const statusBadge = document.getElementById("statusBadge");
+        const statusDot = document.getElementById("statusDot");
+        const statusText = document.getElementById("statusText");
+        const videoPlayer = document.getElementById("videoPlayer");
+        const videoPlaceholder = document.getElementById("videoPlaceholder");
+        
+        const cameraSelect = document.getElementById("cameraSelect");
+        const audioSelect = document.getElementById("audioSelect");
+        const resolutionSelect = document.getElementById("resolutionSelect");
+        const fpsSelect = document.getElementById("fpsSelect");
+        const audioEnabled = document.getElementById("audioEnabled");
+        
+        const hlsUrlInput = document.getElementById("hlsUrl");
+        const mp4UrlInput = document.getElementById("mp4Url");
+        const tsUrlInput = document.getElementById("tsUrl");
+        
+        const logsConsole = document.getElementById("logsConsole");
+        
+        let hls = null;
+        let isConfigLoaded = false;
+        let localIps = [];
+        let hostPort = 8080;
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.querySelector("span").textContent = message;
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 2500);
+        }
+
+        function copyUrl(inputId) {
+            const copyText = document.getElementById(inputId);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+            showToast("Copied streaming URL to clipboard!");
+        }
+
+        // Fetch Server Status
+        async function fetchStatus() {
+            try {
+                const response = await fetch("/api/status");
+                if (!response.ok) throw new Error("Server error");
+                const data = await response.json();
+                
+                // Update Badge
+                if (data.hls_running) {
+                    statusBadge.className = "live-badge";
+                    statusDot.className = "live-dot";
+                    statusText.textContent = "Live Stream Running";
+                } else {
+                    statusBadge.className = "live-badge offline-badge";
+                    statusDot.className = "live-dot offline-dot";
+                    statusText.textContent = "Encoder Stopped";
+                }
+
+                // Load Settings and Select values on first load
+                if (!isConfigLoaded) {
+                    // Save local IPs
+                    localIps = data.ips;
+                    hostPort = data.port;
+                    updateUrlFeeds();
+                    
+                    // Populate Select options
+                    populateSelect(cameraSelect, data.video_devices, data.video_device);
+                    populateSelect(audioSelect, data.audio_devices, data.audio_device);
+                    
+                    // Set settings selection
+                    resolutionSelect.value = data.settings.resolution;
+                    fpsSelect.value = data.settings.fps;
+                    audioEnabled.checked = data.settings.audio_enabled;
+                    
+                    isConfigLoaded = true;
+
+                    // Initialize video stream playback
+                    initPlayer();
+                }
+
+                // Update log view
+                if (data.logs && data.logs.length > 0) {
+                    logsConsole.textContent = data.logs.join("\n");
+                    logsConsole.scrollTop = logsConsole.scrollHeight;
+                } else {
+                    logsConsole.textContent = "No logs yet.";
+                }
+
+            } catch (err) {
+                console.error("Error fetching status:", err);
+                statusBadge.className = "live-badge offline-badge";
+                statusDot.className = "live-dot offline-dot";
+                statusText.textContent = "Server Connection Lost";
+                logsConsole.textContent = "Failed to connect to backend server. Make sure the server process is running.";
+            }
+        }
+
+        function updateUrlFeeds() {
+            // Pick a primary IP (the first non-loopback IP, or fallback to window.location.host)
+            let host = window.location.host;
+            if (localIps && localIps.length > 0) {
+                // If loaded from localhost but we have wifi IP, prefer the wifi IP so links are copyable directly for remote view
+                host = `${localIps[0]}:${hostPort}`;
+            }
+            
+            const protocol = window.location.protocol;
+            hlsUrlInput.value = `${protocol}//${host}/hls/stream.m3u8`;
+            mp4UrlInput.value = `${protocol}//${host}/live.mp4`;
+            tsUrlInput.value = `${protocol}//${host}/live.ts`;
+        }
+
+        function populateSelect(selectEl, list, selectedValue) {
+            selectEl.innerHTML = "";
+            if (!list || list.length === 0) {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.textContent = "No Devices Detected";
+                selectEl.appendChild(opt);
+                return;
+            }
+            list.forEach(item => {
+                const opt = document.createElement("option");
+                opt.value = item;
+                opt.textContent = item;
+                if (item === selectedValue) {
+                    opt.selected = true;
+                }
+                selectEl.appendChild(opt);
+            });
+        }
+
+        // Apply changes to backend
+        async function applySettings() {
+            const queryParams = new URLSearchParams();
+            queryParams.append("video_device", cameraSelect.value);
+            queryParams.append("audio_device", audioSelect.value);
+            queryParams.append("resolution", resolutionSelect.value);
+            queryParams.append("fps", fpsSelect.value);
+            queryParams.append("audio_enabled", audioEnabled.checked);
+            
+            logsConsole.textContent = "Updating config & restarting stream...";
+            
+            try {
+                const response = await fetch(`/api/settings?${queryParams.toString()}`);
+                if (response.ok) {
+                    showToast("Settings applied! Restarting stream...");
+                    // Give server 1.5 seconds to restart encoding then reload player
+                    setTimeout(() => {
+                        initPlayer();
+                    }, 1500);
+                } else {
+                    showToast("Failed to apply settings.");
+                }
+            } catch (err) {
+                console.error("Error setting configs:", err);
+                showToast("Failed to communicate settings to server.");
+            }
+        }
+
+        // Initialize Player
+        function initPlayer() {
+            const hlsSource = "/hls/stream.m3u8";
+            
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
+
+            // Hide placeholder and show player
+            videoPlaceholder.style.display = "flex";
+            videoPlaceholder.querySelector("span").textContent = "Waiting for HLS segment synchronization...";
+
+            // Check if HLS is supported in browser natively (e.g. Safari)
+            if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+                videoPlayer.src = hlsSource;
+                videoPlayer.addEventListener('loadedmetadata', () => {
+                    videoPlaceholder.style.display = "none";
+                    videoPlayer.play();
+                });
+            } 
+            // Or use Hls.js
+            else if (Hls.isSupported()) {
+                hls = new Hls({
+                    liveDurationInfinity: true,
+                    enableWorker: true,
+                    lowLatencyMode: true,
+                    maxBufferLength: 4,
+                    maxMaxBufferLength: 8
+                });
+                
+                hls.loadSource(hlsSource);
+                hls.attachMedia(videoPlayer);
+                
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    videoPlaceholder.style.display = "none";
+                    videoPlayer.play();
+                });
+
+                hls.on(Hls.Events.ERROR, function(event, data) {
+                    if (data.fatal) {
+                        switch(data.type) {
+                            case Hls.ErrorTypes.NETWORK_ERROR:
+                                // Try to recover network error
+                                console.log("HLS Network error encountered, trying to recover...");
+                                hls.startLoad();
+                                break;
+                            case Hls.ErrorTypes.MEDIA_ERROR:
+                                console.log("HLS Media error encountered, trying to recover...");
+                                hls.recoverMediaError();
+                                break;
+                            default:
+                                // Cannot recover, destroy
+                                console.error("HLS Fatal error:", data);
+                                hls.destroy();
+                                hls = null;
+                                videoPlaceholder.style.display = "flex";
+                                videoPlaceholder.querySelector("span").textContent = "Stream loading. Waiting for frames...";
+                                break;
+                        }
+                    }
+                });
+            } else {
+                videoPlaceholder.style.display = "flex";
+                videoPlaceholder.querySelector("span").textContent = "Your browser does not support HLS streaming.";
+            }
+        }
+
+        // Start Polling Status
+        fetchStatus();
+        setInterval(fetchStatus, 2000);
+    </script>
+</body>
+</html>

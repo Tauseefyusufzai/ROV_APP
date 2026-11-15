@@ -1,0 +1,24 @@
+  Hybrid Maps - English  512px_zoom_20.txt
+// Enhanced Unity Configuration for Google Hybrid Maps - English  512px_zoom_20 - GEOSPATIAL INTELLIGENCE  Hybrid Maps - English  512px_zoom_20.txt
+// Military-Grade System with Phase 3 & 4 Features  Hybrid Maps - English  512px_zoom_20.txt
+// Copy these settings to your SafeTiffRenderer component:  Hybrid Maps - English  512px_zoom_20.txt
+  Hybrid Maps - English  512px_zoom_20.txt
+tiffFileName = "Google Hybrid Maps - English  512px_zoom_20_optimized.tif";  Hybrid Maps - English  512px_zoom_20.txt
+  Hybrid Maps - English  512px_zoom_20.txt
+// PHASE 3 & 4 ENHANCED FEATURES (NEW):  Hybrid Maps - English  512px_zoom_20.txt
+enableCoordinateDisplay = true;    // Multi-format coordinate panel  Hybrid Maps - English  512px_zoom_20.txt
+enableElevationDisplay = false;    // No elevation data in RGB imagery  Hybrid Maps - English  512px_zoom_20.txt
+enableMeasurementTools = true;     // Professional distance/area measurement  Hybrid Maps - English  512px_zoom_20.txt
+  Hybrid Maps - English  512px_zoom_20.txt
+// PERFORMANCE SETTINGS (Optimized for enhanced features):  Hybrid Maps - English  512px_zoom_20.txt
+maxTotalTiles = 3000;   // Higher limit for RGB imagery  Hybrid Maps - English  512px_zoom_20.txt
+maxTilesPerFrame = 50;  // Fast loading for responsive feel  Hybrid Maps - English  512px_zoom_20.txt
+maxQueueSize = 250;     // Large queue for smooth panning  Hybrid Maps - English  512px_zoom_20.txt
+maxLoadingTime = 300;   // 5 minute timeout for large files  Hybrid Maps - English  512px_zoom_20.txt
+showDebugInfo = true;   // See all features in action  Hybrid Maps - English  512px_zoom_20.txt
+  Hybrid Maps - English  512px_zoom_20.txt
+// FIXES IMPLEMENTED:  Hybrid Maps - English  512px_zoom_20.txt
+// LOD fluctuation eliminated (stable thresholds)  Hybrid Maps - English  512px_zoom_20.txt  
+// Small map optimization (prevents unnecessary overviews)  Hybrid Maps - English  512px_zoom_20.txt
+// ? Elevation data integration (automatic DEM detection)  Hybrid Maps - English  512px_zoom_20.txt
+// ? MGRS coordinate support (military grid reference)  Hybrid Maps - English  512px_zoom_20.txt

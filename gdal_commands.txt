@@ -1,0 +1,29 @@
+# GDAL Commands for Processing Large TIFF Files
+# ================================================
+
+# Step 1: Install GDAL (if not already installed)
+# Download from: https://gdal.org/download.html
+# Or use conda: conda install -c conda-forge gdal
+# Or use pip: pip install GDAL
+
+# Step 2: Create tiled version with overviews
+# Replace 'YourLarge2GBFile.tif' with your actual filename
+
+# Basic tiling command (creates 512x512 tiles)
+gdal_translate -of GTiff -co TILED=YES -co COMPRESS=LZW YourLarge2GBFile.tif TiledOutput.tif
+
+# Step 3: Add overviews/pyramids (LOD levels) to the tiled file
+gdaladdo -r average TiledOutput.tif 2 4 8 16
+
+# Alternative: If you want separate tile files (more advanced approach)
+# This creates individual tile files - use this for extremely large datasets
+# gdal2tiles.py -p raster -z 0-10 YourLarge2GBFile.tif TileFolder/
+
+# Step 4: Move the processed file to Unity StreamingAssets
+# Copy TiledOutput.tif to: Assets/StreamingAssets/
+
+# Notes:
+# - TILED=YES creates internal tiling for faster access
+# - COMPRESS=LZW reduces file size
+# - The numbers 2,4,8,16 create overview levels at 1/2, 1/4, 1/8, 1/16 resolution
+# - Higher zoom levels (like 0-15) create more detail levels but take longer to process

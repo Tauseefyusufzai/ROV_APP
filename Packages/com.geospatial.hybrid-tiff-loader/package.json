@@ -1,0 +1,40 @@
+{
+  "name": "com.geospatial.hybrid-tiff-loader",
+  "version": "1.0.0",
+  "displayName": "Hybrid Geospatial TIFF Loader",
+  "description": "Complete offline geospatial TIFF rendering system for Unity combining GDAL.NET and BitMiracle LibTiff.NET for professional GIS applications.",
+  "unity": "2021.3",
+  "unityRelease": "0f1",
+  "dependencies": {},
+  "keywords": [
+    "GDAL",
+    "GeoTIFF", 
+    "Geospatial",
+    "GIS",
+    "TIFF",
+    "Mapping",
+    "Coordinate Systems",
+    "Projection",
+    "Offline"
+  ],
+  "author": {
+    "name": "Hybrid Geospatial Systems",
+    "email": "support@hybridgeospatial.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/hybrid-geospatial-tiff.git"
+  },
+  "samples": [
+    {
+      "displayName": "Basic GeoTIFF Loading",
+      "description": "Simple example of loading and displaying a GeoTIFF file",
+      "path": "Samples~/BasicGeoTiffLoading"
+    },
+    {
+      "displayName": "Advanced Geospatial Features", 
+      "description": "Complete demo with coordinate transformations and real-time queries",
+      "path": "Samples~/AdvancedGeospatialFeatures"
+    }
+  ]
+}

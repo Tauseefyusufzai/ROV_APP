@@ -1,0 +1,101 @@
+// =============================================================================
+// ROV ExoPlayer Plugin — Gradle Build
+//
+// Builds an AAR containing ExoPlayer + RTSP module for use in Unity.
+//
+// Usage:
+//   cd PluginsCode/ExoPlayerPlugin
+//   .\gradlew.bat assembleRelease
+//
+// Output:
+//   build/outputs/aar/ExoPlayerPlugin-release.aar
+//   → Auto-copied to: Assets/Plugins/Android/ExoPlayerPlugin.aar
+// =============================================================================
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.2.2'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 30
+
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    // ExoPlayer — compile-only so Unity's mainTemplate.gradle provides the
+    // runtime classes. Using 'compileOnly' prevents the duplicate-class
+    // conflict that caused java.lang.IllegalArgumentException in
+    // ExoPlayer.Builder.<init> when both the AAR and mainTemplate.gradle
+    // declared ExoPlayer as 'implementation'.
+    compileOnly 'com.google.android.exoplayer:exoplayer-core:2.19.1'
+    compileOnly 'com.google.android.exoplayer:exoplayer-rtsp:2.19.1'
+    compileOnly 'com.google.android.exoplayer:exoplayer-ui:2.19.1'
+    compileOnly 'com.google.android.exoplayer:exoplayer-hls:2.19.1'
+    compileOnly 'com.google.android.exoplayer:exoplayer-dash:2.19.1'
+}
+
+// =============================================================================
+// Auto-copy AAR to Unity Plugins folder after successful build
+// =============================================================================
+
+task copyAarToUnity(type: Copy) {
+    from 'build/outputs/aar/ExoPlayerPlugin-release.aar'
+    into '../../Assets/Plugins/Android'
+    rename 'ExoPlayerPlugin-release.aar', 'ExoPlayerPlugin.aar'
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'assembleRelease') {
+        task.finalizedBy copyAarToUnity
+    }
+}
+
+
+
+

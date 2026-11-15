@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - editPanel
+  - StatusPane
+  - personCategory
+  - map
+  - iedTab
+  - personnelTab
+  - iedEditPanel
+  - personEditPanel
+  - sidePane
+  - miniScoreBoard
+  - debugger
+  - homePageButton
+  - mapContainer
+  - cameraMap
+  - mapHolder
+  - dialogues
+  - savedExerciseStatusPane
+  - replayPane
+  - alert
+  - notification
+  - mapPane
+  - addNewMap
+  - configureMapWindow
+  - mapNameHolder
+  - savedExercisePage
+  - PersonButton
+  - BlockCameraInput
+  - DeleteAlertPanel
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - Effects
+  - mapIcons
+  - Dialog
+  - VideoPlayer
+  - MapDisplayLayer
+  - background
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 1314701955
+    locked: 0
+  - name: Panels
+    uniqueID: 593485387
+    locked: 0
+  - name: Buttons
+    uniqueID: 1948678755
+    locked: 0
+  - name: Map
+    uniqueID: 1181382717
+    locked: 0
+  - name: Map Icons
+    uniqueID: 2828412031
+    locked: 0
+  - name: Dialog
+    uniqueID: 3553262117
+    locked: 0

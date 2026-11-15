@@ -1,0 +1,24 @@
+ 
+// Enhanced Unity Configuration for testingzoom_17 - GEOSPATIAL INTELLIGENCE 
+// Military-Grade System with Phase 3 & 4 Features 
+// Copy these settings to your SafeTiffRenderer component: 
+ 
+tiffFileName = "testingzoom_17_optimized.tif"; 
+ 
+// PHASE 3 & 4 ENHANCED FEATURES (NEW): 
+enableCoordinateDisplay = true;    // Multi-format coordinate panel 
+enableElevationDisplay = false;    // No elevation data in RGB imagery 
+enableMeasurementTools = true;     // Professional distance/area measurement 
+ 
+// PERFORMANCE SETTINGS (Optimized for enhanced features): 
+maxTotalTiles = 3000;   // Higher limit for RGB imagery 
+maxTilesPerFrame = 50;  // Fast loading for responsive feel 
+maxQueueSize = 250;     // Large queue for smooth panning 
+maxLoadingTime = 300;   // 5 minute timeout for large files 
+showDebugInfo = true;   // See all features in action 
+ 
+// FIXES IMPLEMENTED: 
+// LOD fluctuation eliminated (stable thresholds)   
+// Small map optimization (prevents unnecessary overviews) 
+// ? Elevation data integration (automatic DEM detection) 
+// ? MGRS coordinate support (military grid reference) 
